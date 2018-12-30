@@ -6,7 +6,6 @@ use std::str;
 pub struct LogBuffer<Storage> {
     storage: Storage,
     wrapped: bool,
-    start: usize,
     end: usize,
 }
 
@@ -15,7 +14,6 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         let mut log_buffer = LogBuffer {
             storage: storage,
             wrapped: false,
-            start: 0,
             end: 0,
         };
 
@@ -25,7 +23,6 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
 
     pub fn clear(&mut self) {
         self.wrapped = false;
-        self.start = 0;
         self.end = 0;
         for byte in self.storage.as_mut().iter_mut() {
             *byte = 0x00;
@@ -33,18 +30,14 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     }
 
     pub fn is_empty(&self) -> bool {
-        (self.start == self.end) && !self.wrapped
+        (self.end == 0) && !self.wrapped
     }
 
     pub fn len(&self) -> usize {
-        if self.start < self.end {
-            (self.start - self.end) + 1
-        } else if self.start > self.end {
-            (self.end - self.start) + 1
-        } else if self.wrapped && self.start == self.end {
+        if self.wrapped {
             self.storage.as_ref().len()
         } else {
-            0
+            self.end
         }
     }
 
@@ -57,30 +50,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     }
 
     fn rotate(&mut self) {
-        if self.wrapped && (self.start == self.end) {
-            self.storage.as_mut().rotate_left(self.end);
-            self.wrapped = false;
-            self.start = 0;
-            self.end = self.storage.as_ref().len();
-        } else if self.start < self.end {
-            self.storage.as_mut().rotate_left(self.start);
-            self.wrapped = false;
-            self.end -= self.start;
-            self.start = 0;
-        } else if self.start > self.end {
-            self.storage.as_mut().rotate_left(self.end);
-            self.wrapped = false;
-            self.start -= self.end;
-            self.end = self.storage.as_ref().len();
-            self.storage.as_mut().rotate_left(self.start);
-            self.end -= self.start;
-            self.start = 0;
-        } else {
-            self.storage.as_mut().rotate_left(self.start);
-            self.wrapped = false;
-            self.start = 0;
-            self.end = 0;
-        }
+        unimplemented!();
     }
 
     pub fn extract(&mut self) -> &str {
@@ -92,9 +62,8 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         self.rotate();
 
         let buffer = self.storage.as_mut();
-        let start = self.start;
         let end = self.end;
-        for i in start..end {
+        for i in 0..end {
             if is_utf8_leader(buffer[i]) {
                 return str::from_utf8(&buffer[i..end]).unwrap();
             }
@@ -133,14 +102,32 @@ mod tests {
 
         log_buffer.rotate();
         let wrapped = log_buffer.wrapped;
-        let start = log_buffer.start;
         let end = log_buffer.end;
         let storage = log_buffer.storage;
         log_buffer.rotate();
 
         assert_eq!(log_buffer.wrapped, wrapped);
-        assert_eq!(log_buffer.start, start);
         assert_eq!(log_buffer.end, end);
         assert_eq!(log_buffer.storage, storage);
+    }
+
+    #[test]
+    fn log_buffer_rotate_should_unwrap_buffer() {
+        let mut log_buffer = LogBuffer::new([0xFF; 16]);
+        write!(log_buffer, "abcdefghijklmnop").unwrap();
+
+        assert_eq!(log_buffer.wrapped, true);
+        log_buffer.rotate();
+        assert_eq!(log_buffer.wrapped, false);
+    }
+
+    #[test]
+    fn log_buffer_rotate_should_unwrap_end() {
+        let mut log_buffer = LogBuffer::new([0xFF; 16]);
+        write!(log_buffer, "abcdefghijklmnop").unwrap();
+
+        let end_before_rotate = log_buffer.end;
+        log_buffer.rotate();
+        assert!(log_buffer.end > end_before_rotate);
     }
 }
