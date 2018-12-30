@@ -12,7 +12,7 @@ fn test_empty_log_buffer_should_be_empty() {
 }
 
 #[test]
-fn test_empty_log_buffer_should_have_no_text() {
+fn test_empty_log_buffer_extract_should_be_empty_string() {
     let mut log_buffer = LogBuffer::new([0x00; 16]);
     let result = log_buffer.extract();
     let expected = "";
