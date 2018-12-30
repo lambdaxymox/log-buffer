@@ -3,14 +3,14 @@ use std::str;
 
 
 #[derive(Debug)]
-pub struct LogBuffer<Storage: AsRef<[u8]> + AsMut<[u8]>> {
+pub struct LogBuffer<Storage> {
     buffer: Storage,
     wrapped: bool,
     start: usize,
     end: usize,
 }
 
-impl<Storage: AsRef<[u8]> + AsMut<[u8]>> LogBuffer<Storage> {
+impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     pub fn new(storage: Storage) -> LogBuffer<Storage> {
         let mut log_buffer = LogBuffer {
             buffer: storage,
@@ -104,7 +104,7 @@ impl<Storage: AsRef<[u8]> + AsMut<[u8]>> LogBuffer<Storage> {
     }
 }
 
-impl<Storage: AsRef<[u8]> + AsMut<[u8]>> fmt::Write for LogBuffer<Storage> {
+impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     fn write_str(&mut self, st: &str) -> fmt::Result {
         for &byte in st.as_bytes() {
             self.buffer.as_mut()[self.end] = byte;
