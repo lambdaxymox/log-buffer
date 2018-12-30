@@ -53,3 +53,11 @@ fn log_buffer_with_string_equal_to_length_in_bytes_should_be_full() {
 
     assert!(log_buffer.is_full());
 }
+
+#[test]
+fn log_buffer_containing_data_should_not_be_empty() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnop").unwrap();
+
+    assert!(!log_buffer.is_empty());
+}
