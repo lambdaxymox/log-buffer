@@ -37,11 +37,19 @@ fn log_buffer_should_have_capacity_equal_to_underlying_storage_size() {
 }
 
 #[test]
-fn log_buffer_extracted_string_should_match_inserted_string() {
+fn log_buffer_extracted_string_should_match_inserted_string_of_length_at_most_the_buffer_size() {
     let mut log_buffer = LogBuffer::new([0x00; 16]);
     let expected = "abcdefghijklmnop";
     write!(log_buffer, "{}", expected).unwrap();
     let result = log_buffer.extract();
 
     assert_eq!(result, expected);
+}
+
+#[test]
+fn log_buffer_with_string_equal_to_length_in_bytes_should_be_full() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnop").unwrap();
+
+    assert!(log_buffer.is_full());
 }

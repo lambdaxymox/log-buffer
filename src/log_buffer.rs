@@ -92,9 +92,11 @@ impl<Storage: AsRef<[u8]> + AsMut<[u8]>> LogBuffer<Storage> {
         self.rotate();
 
         let buffer = self.buffer.as_mut();
-        for i in 0..buffer.len() {
+        let start = self.start;
+        let end = self.end;
+        for i in start..end {
             if is_utf8_leader(buffer[i]) {
-                return str::from_utf8(&buffer[i..self.end]).unwrap();
+                return str::from_utf8(&buffer[i..end]).unwrap();
             }
         }
 
@@ -106,10 +108,11 @@ impl<Storage: AsRef<[u8]> + AsMut<[u8]>> fmt::Write for LogBuffer<Storage> {
     fn write_str(&mut self, st: &str) -> fmt::Result {
         for &byte in st.as_bytes() {
             self.buffer.as_mut()[self.end] = byte;
-            if self.end >= self.buffer.as_ref().len() - 1 {
+            self.end += 1;
+            if self.end > self.buffer.as_ref().len() {
                 self.wrapped = true;
             }
-            self.end = (self.end + 1) % self.buffer.as_mut().len();
+            self.end %= self.buffer.as_mut().len();
         }
 
         Ok(())
