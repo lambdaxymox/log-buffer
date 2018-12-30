@@ -4,6 +4,8 @@ use log_buffer::LogBuffer;
 use std::fmt::Write;
 
 
+///
+///
 #[test]
 fn empty_log_buffer_should_be_empty() {
     let log_buffer = LogBuffer::new([0x00; 16]);
@@ -84,6 +86,17 @@ fn log_buffer_should_correctly_extract_data_after_multiple_cycles() {
     write!(log_buffer, "abcdefghijklmnopqrstuv").unwrap();
 
     let expected = "ghijklmnopqrstuv";
+    let result = log_buffer.extract();
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn log_buffer_should_only_contain_the_last_buffer_length_number_of_bytes_put_into_it() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnopqrstuvwxyz1234567890").unwrap();
+
+    let expected = "uvwxyz1234567890";
     let result = log_buffer.extract();
 
     assert_eq!(result, expected);
