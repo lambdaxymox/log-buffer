@@ -50,7 +50,11 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     }
 
     fn rotate(&mut self) {
-        unimplemented!();
+        if self.wrapped {
+            self.storage.as_mut().rotate_left(self.end);
+            self.end = self.len() - 1;
+            self.wrapped = false;
+        }
     }
 
     pub fn extract(&mut self) -> &str {
@@ -104,6 +108,7 @@ mod tests {
         let wrapped = log_buffer.wrapped;
         let end = log_buffer.end;
         let storage = log_buffer.storage;
+        log_buffer.rotate();
         log_buffer.rotate();
 
         assert_eq!(log_buffer.wrapped, wrapped);
