@@ -4,7 +4,7 @@ use std::str;
 
 #[derive(Debug)]
 pub struct LogBuffer<Storage> {
-    buffer: Storage,
+    storage: Storage,
     wrapped: bool,
     start: usize,
     end: usize,
@@ -13,7 +13,7 @@ pub struct LogBuffer<Storage> {
 impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     pub fn new(storage: Storage) -> LogBuffer<Storage> {
         let mut log_buffer = LogBuffer {
-            buffer: storage,
+            storage: storage,
             wrapped: false,
             start: 0,
             end: 0,
@@ -27,7 +27,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         self.wrapped = false;
         self.start = 0;
         self.end = 0;
-        for byte in self.buffer.as_mut().iter_mut() {
+        for byte in self.storage.as_mut().iter_mut() {
             *byte = 0x00;
         }
     }
@@ -42,7 +42,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         } else if self.start > self.end {
             (self.end - self.start) + 1
         } else if self.wrapped && self.start == self.end {
-            self.buffer.as_ref().len()
+            self.storage.as_ref().len()
         } else {
             0
         }
@@ -53,30 +53,30 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     }
 
     pub fn capacity(&self) -> usize {
-        self.buffer.as_ref().len()
+        self.storage.as_ref().len()
     }
 
     fn rotate(&mut self) {
         if self.wrapped && (self.start == self.end) {
-            self.buffer.as_mut().rotate_left(self.end);
+            self.storage.as_mut().rotate_left(self.end);
             self.wrapped = false;
             self.start = 0;
-            self.end = self.buffer.as_ref().len();
+            self.end = self.storage.as_ref().len();
         } else if self.start < self.end {
-            self.buffer.as_mut().rotate_left(self.start);
+            self.storage.as_mut().rotate_left(self.start);
             self.wrapped = false;
             self.end -= self.start;
             self.start = 0;
         } else if self.start > self.end {
-            self.buffer.as_mut().rotate_left(self.end);
+            self.storage.as_mut().rotate_left(self.end);
             self.wrapped = false;
             self.start -= self.end;
-            self.end = self.buffer.as_ref().len();
-            self.buffer.as_mut().rotate_left(self.start);
+            self.end = self.storage.as_ref().len();
+            self.storage.as_mut().rotate_left(self.start);
             self.end -= self.start;
             self.start = 0;
         } else {
-            self.buffer.as_mut().rotate_left(self.start);
+            self.storage.as_mut().rotate_left(self.start);
             self.wrapped = false;
             self.start = 0;
             self.end = 0;
@@ -91,7 +91,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
 
         self.rotate();
 
-        let buffer = self.buffer.as_mut();
+        let buffer = self.storage.as_mut();
         let start = self.start;
         let end = self.end;
         for i in start..end {
@@ -107,12 +107,12 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
 impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     fn write_str(&mut self, st: &str) -> fmt::Result {
         for &byte in st.as_bytes() {
-            self.buffer.as_mut()[self.end] = byte;
+            self.storage.as_mut()[self.end] = byte;
             self.end += 1;
-            if self.end >= self.buffer.as_ref().len() {
+            if self.end >= self.storage.as_ref().len() {
                 self.wrapped = true;
             }
-            self.end %= self.buffer.as_mut().len();
+            self.end %= self.storage.as_mut().len();
         }
 
         Ok(())
@@ -135,12 +135,12 @@ mod tests {
         let wrapped = log_buffer.wrapped;
         let start = log_buffer.start;
         let end = log_buffer.end;
-        let storage = log_buffer.buffer;
+        let storage = log_buffer.storage;
         log_buffer.rotate();
 
         assert_eq!(log_buffer.wrapped, wrapped);
         assert_eq!(log_buffer.start, start);
         assert_eq!(log_buffer.end, end);
-        assert_eq!(log_buffer.buffer, storage);
+        assert_eq!(log_buffer.storage, storage);
     }
 }
