@@ -27,3 +27,11 @@ fn test_empty_log_buffer_should_have_length_zero() {
 
     assert_eq!(log_buffer.len(), 0);
 }
+
+#[test]
+fn test_log_buffer_should_have_capacity_equal_to_underlying_storage_size() {
+    let mut storage = [0xFF as u8; 32];
+    let mut log_buffer = LogBuffer::new(storage);
+
+    assert_eq!(log_buffer.capacity(), storage.len());
+}
