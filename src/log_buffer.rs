@@ -86,7 +86,7 @@ impl<Storage: AsRef<[u8]> + AsMut<[u8]>> LogBuffer<Storage> {
         let buffer = self.buffer.as_mut();
         for i in 0..buffer.len() {
             if is_utf8_leader(buffer[i]) {
-                return str::from_utf8(&buffer[i..]).unwrap();
+                return str::from_utf8(&buffer[i..self.end]).unwrap();
             }
         }
 
