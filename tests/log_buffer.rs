@@ -21,3 +21,9 @@ fn test_empty_log_buffer_extract_should_be_empty_string() {
 
 }
 
+#[test]
+fn test_empty_log_buffer_should_have_length_zero() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+
+    assert_eq!(log_buffer.len(), 0);
+}
