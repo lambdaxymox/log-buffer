@@ -97,3 +97,14 @@ fn log_buffer_should_be_empty_after_clear() {
 
     assert!(log_buffer.is_empty());
 }
+
+#[test]
+fn log_buffer_extract_after_clear_should_be_empty_string() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnop").unwrap();
+    log_buffer.clear();
+    let result = log_buffer.extract();
+    let expected = "";
+
+    assert_eq!(result, expected);
+}
