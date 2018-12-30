@@ -113,10 +113,10 @@ fn log_buffer_extract_after_clear_should_be_empty_string() {
 fn log_buffer_extract_after_extract_should_yield_same_string() {
     let mut log_buffer = LogBuffer::new([0x00; 16]);
     write!(log_buffer, "abcdefghijklmn").unwrap();
-    log_buffer.extract();
 
-    let result = log_buffer.extract();
-    let expected = "abcdefghijklmn";
+    let result = String::from(log_buffer.extract());
+    let expected = String::from(log_buffer.extract());
 
     assert_eq!(result, expected);
 }
+
