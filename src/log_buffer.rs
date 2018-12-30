@@ -94,7 +94,7 @@ impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsM
 
 
 #[cfg(test)]
-mod tests {
+mod rotate_tests {
     use super::LogBuffer;
     use std::fmt::Write;
 
