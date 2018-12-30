@@ -37,7 +37,15 @@ impl<Storage: AsRef<[u8]> + AsMut<[u8]>> LogBuffer<Storage> {
     }
 
     pub fn len(&self) -> usize {
-        unimplemented!();
+        if self.start < self.end {
+            (self.start - self.end) + 1
+        } else if self.start > self.end {
+            (self.end - self.start) + 1
+        } else if self.wrapped && self.start == self.end {
+            self.buffer.as_ref().len()
+        } else {
+            0
+        }
     }
 
     pub fn is_full(&self) -> bool {
