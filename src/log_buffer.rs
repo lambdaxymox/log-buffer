@@ -118,3 +118,29 @@ impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsM
         Ok(())
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::LogBuffer;
+    use std::fmt::Write;
+
+
+    #[test]
+    fn log_buffer_successive_rotate_operations_should_leave_internal_state_unchanged() {
+        let mut log_buffer = LogBuffer::new([0xFF; 16]);
+        write!(log_buffer, "abcdefgh").unwrap();
+
+        log_buffer.rotate();
+        let wrapped = log_buffer.wrapped;
+        let start = log_buffer.start;
+        let end = log_buffer.end;
+        let storage = log_buffer.buffer;
+        log_buffer.rotate();
+
+        assert_eq!(log_buffer.wrapped, wrapped);
+        assert_eq!(log_buffer.start, start);
+        assert_eq!(log_buffer.end, end);
+        assert_eq!(log_buffer.buffer, storage);
+    }
+}
