@@ -88,3 +88,12 @@ fn log_buffer_should_correctly_extract_data_after_multiple_cycles() {
 
     assert_eq!(result, expected);
 }
+
+#[test]
+fn log_buffer_should_be_empty_after_clear() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnop").unwrap();
+    log_buffer.clear();
+
+    assert!(log_buffer.is_empty());
+}
