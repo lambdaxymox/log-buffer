@@ -3,5 +3,6 @@ name = "log-buffer"
 version = "0.1.0"
 authors = ["Stallmanifold <stallmanifold@gmail.com>"]
 edition = "2018"
+description = "A library for working with ring buffers that store UTF-8 strings for logging."
 
 [dependencies]
