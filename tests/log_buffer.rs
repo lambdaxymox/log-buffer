@@ -41,6 +41,7 @@ fn log_buffer_extracted_string_should_match_inserted_string_of_length_at_most_th
     let mut log_buffer = LogBuffer::new([0x00; 16]);
     let expected = "abcdefghijklmnop";
     write!(log_buffer, "{}", expected).unwrap();
+    eprintln!("{:?}", log_buffer);
     let result = log_buffer.extract();
 
     assert_eq!(result, expected);

@@ -61,7 +61,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
             self.buffer.as_mut().rotate_left(self.end);
             self.wrapped = false;
             self.start = 0;
-            self.end = self.buffer.as_ref().len() - 1;
+            self.end = self.buffer.as_ref().len();
         } else if self.start < self.end {
             self.buffer.as_mut().rotate_left(self.start);
             self.wrapped = false;
@@ -71,7 +71,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
             self.buffer.as_mut().rotate_left(self.end);
             self.wrapped = false;
             self.start -= self.end;
-            self.end = self.buffer.as_ref().len() - 1;
+            self.end = self.buffer.as_ref().len();
             self.buffer.as_mut().rotate_left(self.start);
             self.end -= self.start;
             self.start = 0;
@@ -109,7 +109,7 @@ impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsM
         for &byte in st.as_bytes() {
             self.buffer.as_mut()[self.end] = byte;
             self.end += 1;
-            if self.end > self.buffer.as_ref().len() {
+            if self.end >= self.buffer.as_ref().len() {
                 self.wrapped = true;
             }
             self.end %= self.buffer.as_mut().len();
