@@ -52,7 +52,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     fn rotate(&mut self) {
         if self.wrapped {
             self.storage.as_mut().rotate_left(self.end);
-            self.end = self.len() - 1;
+            self.end = self.len();
             self.wrapped = false;
         }
     }
