@@ -62,3 +62,13 @@ fn log_buffer_containing_data_should_not_be_empty() {
 
     assert!(!log_buffer.is_empty());
 }
+
+#[test]
+fn log_buffer_string_longer_than_buffer_length_should_wrap_around() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnopqrstuv").unwrap();
+    let expected = "ghijklmnopqrstuv";
+    let result = log_buffer.extract();
+
+    assert_eq!(result, expected);
+}
