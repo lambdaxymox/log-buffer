@@ -4,7 +4,7 @@ use std::str;
 
 ///
 /// A `LogBuffer` is a ring buffer for storing UTF-8 strings for logging.
-/// It logs data using zero allocations for faster performance.
+/// It logs data using zero allocations.
 ///
 #[derive(Debug)]
 pub struct LogBuffer<Storage> {
