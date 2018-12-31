@@ -100,6 +100,19 @@ fn log_buffer_containing_data_should_not_be_empty() {
 }
 
 ///
+/// GIVEN: A log buffer containing data.
+/// WHEN: We call ``.
+/// THEN: Its length should be no larger than the capacity of the buffer.
+///
+#[test]
+fn log_buffer_containing_data_should_have_length_no_larger_than_capacity() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklm").unwrap();
+
+    assert!(log_buffer.len() <= log_buffer.capacity());
+}
+
+///
 /// GIVEN: A log buffer and a string input longer than the buffer size.
 /// WHEN: We write the string to the buffer.
 /// THEN: The last buffer length worth of bytes in the string should be present.
@@ -196,3 +209,27 @@ fn log_buffer_extract_after_extract_should_yield_same_string() {
     assert_eq!(result, expected);
 }
 
+///
+/// GIVEN: A filled log buffer.
+/// WHEN: We call `space_remaining()`.
+/// THEN: There should be no space remaining.
+///
+#[test]
+fn filled_log_buffer_should_have_no_space_remaining() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    write!(log_buffer, "abcdefghijklmnop").unwrap();
+
+    assert_eq!(log_buffer.space_remaining(), 0);
+}
+
+///
+/// GIVEN: An empty log buffer.
+/// WHEN: We call `space_remaining()`.
+/// THEN: The space remaining should be equal to the capacity of the buffer.
+///
+#[test]
+fn empty_log_buffer_should_have_maximum_space_remaining() {
+    let mut log_buffer = LogBuffer::new([0x00; 16]);
+
+    assert_eq!(log_buffer.space_remaining(), log_buffer.capacity());
+}
