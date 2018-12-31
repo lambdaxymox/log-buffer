@@ -61,10 +61,17 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
     }
 
     ///
+    /// Calculate the amount of space in bytes remaining in the ring buffer.
+    ///
+    pub fn space_remaining(&self) -> usize {
+        self.capacity() - self.len()
+    }
+
+    ///
     /// Determine whether the ring buffer is full.
     ///
     pub fn is_full(&self) -> bool {
-        self.len() == self.capacity()
+        self.space_remaining() == 0
     }
 
     ///
