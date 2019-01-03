@@ -7,7 +7,7 @@ In order the use the log buffer crate, fork this repo and put the following line
 in your cargo config file.
 
 ```
-log_buffer = "1.1.0"
+log_buffer = "1.1.2"
 ```
 
 ## Dependencies

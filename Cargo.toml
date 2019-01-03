@@ -1,6 +1,6 @@
 [package]
 name = "log_buffer"
-version = "1.1.1"
+version = "1.1.2"
 authors = ["Stallmanifold <stallmanifold@gmail.com>"]
 edition = "2018"
 description = "A library providing ring buffers that store UTF-8 strings for logging."
