@@ -47,6 +47,7 @@
 //!
 //! See the `examples` directory in the source tree for more examples.
 //!
+#![no_std]
 mod log_buffer;
 
 pub use self::log_buffer::*;

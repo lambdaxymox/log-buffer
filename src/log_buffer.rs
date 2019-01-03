@@ -1,5 +1,5 @@
-use std::fmt;
-use std::str;
+use core::fmt;
+use core::str;
 
 
 ///
@@ -136,7 +136,7 @@ impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsM
 #[cfg(test)]
 mod rotate_tests {
     use super::LogBuffer;
-    use std::fmt::Write;
+    use core::fmt::Write;
 
 
     #[test]
