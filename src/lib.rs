@@ -5,7 +5,7 @@
 //! In order the use the log buffer crate, put the following line in your cargo config file:
 //!
 //! ```text
-//! log_buffer = "1.1.5"
+//! log_buffer = "1.1.6"
 //! ```
 //!
 //! # Dependencies
