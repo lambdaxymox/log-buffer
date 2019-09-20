@@ -2,13 +2,11 @@ use core::fmt;
 use core::str;
 
 
-///
 /// A `LogBuffer` is a ring buffer for storing UTF-8 strings for logging.
 /// It logs data using zero allocations.
-///
 #[derive(Debug)]
 pub struct LogBuffer<Storage> {
-    /// the underlying storage for the ring buffer.
+    /// The underlying storage for the ring buffer.
     storage: Storage,
     /// Whether the ring buffer has wrapped around since its last call to rotate.
     wrapped: bool,
@@ -17,9 +15,7 @@ pub struct LogBuffer<Storage> {
 }
 
 impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
-    ///
     /// Construct a new log buffer.
-    ///
     pub fn new(storage: Storage) -> LogBuffer<Storage> {
         let mut log_buffer = LogBuffer {
             storage: storage,
@@ -31,9 +27,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         log_buffer
     }
 
-    ///
     /// Empty out the log buffer.
-    ///
     pub fn clear(&mut self) {
         self.wrapped = false;
         self.end = 0;
@@ -42,16 +36,12 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         }
     }
 
-    ///
     /// Determine whether the ring buffer is empty, i.e. it contains no data.
-    ///
     pub fn is_empty(&self) -> bool {
         (self.end == 0) && !self.wrapped
     }
 
-    ///
     /// Determine the number of bytes currently stored in the log buffer.
-    ///
     pub fn len(&self) -> usize {
         if self.wrapped {
             self.storage.as_ref().len()
@@ -60,25 +50,19 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         }
     }
 
-    ///
     /// Calculate the amount of space in bytes remaining in the ring buffer.
-    ///
     pub fn space_remaining(&self) -> usize {
         self.capacity() - self.len()
     }
 
-    ///
     /// Determine whether the ring buffer is full.
-    ///
     pub fn is_full(&self) -> bool {
         self.space_remaining() == 0
     }
 
-    ///
     /// The maximum number of bytes that a log buffer can store. This is not
     /// the same as the number of UTF-8 characters the buffer can store since
     /// UTF-8 characters can have multiple code points.
-    ///
     pub fn capacity(&self) -> usize {
         self.storage.as_ref().len()
     }
@@ -91,9 +75,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
         }
     }
 
-    ///
     /// Extract a string slice from the ring buffer. This is a zero allocation operation.
-    ///
     pub fn extract(&mut self) -> &str {
         fn is_utf8_leader(byte: u8) -> bool {
             byte & 0b10000000 == 0b00000000 || byte & 0b11100000 == 0b11000000 ||
@@ -115,9 +97,7 @@ impl<Storage> LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
 }
 
 impl<Storage> fmt::Write for LogBuffer<Storage> where Storage: AsRef<[u8]> + AsMut<[u8]> {
-    ///
     /// Write a UTF-8 string into the ring buffer.
-    ///
     fn write_str(&mut self, st: &str) -> fmt::Result {
         for &byte in st.as_bytes() {
             self.storage.as_mut()[self.end] = byte;
