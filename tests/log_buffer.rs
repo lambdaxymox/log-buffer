@@ -197,7 +197,7 @@ fn filled_log_buffer_should_have_no_space_remaining() {
 /// THEN: The space remaining should be equal to the capacity of the buffer.
 #[test]
 fn empty_log_buffer_should_have_maximum_space_remaining() {
-    let mut log_buffer = LogBuffer::new([0x00; 16]);
+    let log_buffer = LogBuffer::new([0x00; 16]);
 
     assert_eq!(log_buffer.space_remaining(), log_buffer.capacity());
 }
